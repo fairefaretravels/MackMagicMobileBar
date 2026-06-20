@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#2e3636" />
+<title>Pricing | Mack Magic Mobile Bar</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root{
+    --tan:        #c9a876;
+    --peach:      #f3ddc4;
+    --teal:       #4f7a78;
+    --teal-grey:  #5c7876;
+    --charcoal:   #232b2a;
+    --ink:        #1a201f;
+  }
+
+  html, body{
+    min-height: 100%;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(92,120,118,0.18) 0%, rgba(35,43,42,0) 55%),
+      var(--charcoal);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    color: var(--peach);
+  }
+
+  body{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6vh 6vw 10vh;
+    text-align: center;
+  }
+
+  .grid-bg{
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(92,120,118,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(92,120,118,0.05) 1px, transparent 1px);
+    background-size: 42px 42px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .vignette{
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(26,32,31,0) 35%, rgba(26,32,31,0.55) 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page-head{
+    position: relative;
+    z-index: 1;
+    margin-bottom: 36px;
+  }
+  .page-head h1{
+    font-size: clamp(24px, 6vw, 34px);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--peach);
+    font-weight: 700;
+  }
+  .page-head .sub{
+    margin-top: 8px;
+    font-size: 12px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--tan);
+    opacity: 0.9;
+  }
+
+  .section{
+    position: relative;
+    z-index: 1;
+    width: min(560px, 92vw);
+    margin-top: 56px;
+  }
+  .section-title{
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--tan);
+    border-bottom: 1px solid rgba(201,168,118,0.3);
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+  }
+
+  .card{
+    border-radius: 14px;
+    border: 1px solid rgba(243,221,196,0.25);
+    background: linear-gradient(180deg, rgba(92,120,118,0.16), rgba(35,43,42,0.4));
+    padding: 26px 24px;
+    margin-bottom: 22px;
+    text-align: left;
+  }
+  .card-head{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .card-head .name{
+    font-size: clamp(18px, 4.2vw, 21px);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--peach);
+  }
+  .card-head .price{
+    font-size: clamp(17px, 4vw, 20px);
+    color: var(--tan);
+    font-weight: 700;
+  }
+  .card .note{
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--tan);
+    opacity: 0.85;
+    margin-bottom: 16px;
+  }
+  .card h4{
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tan);
+    opacity: 0.9;
+    margin-top: 14px;
+    margin-bottom: 8px;
+  }
+  .card ul{
+    list-style: none;
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(243,221,196,0.9);
+  }
+  .card ul li::before{
+    content: "• ";
+    color: var(--tan);
+  }
+  .card p{
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(243,221,196,0.9);
+  }
+  .card .rates{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 4px;
+  }
+  .card .rates span{
+    font-size: 13px;
+    color: var(--peach);
+    background: rgba(92,120,118,0.18);
+    border: 1px solid rgba(201,168,118,0.25);
+    border-radius: 8px;
+    padding: 6px 12px;
+  }
+
+  /* add-ons grid */
+  .addons{
+    border-radius: 14px;
+    border: 1px solid rgba(243,221,196,0.25);
+    background: linear-gradient(180deg, rgba(92,120,118,0.16), rgba(35,43,42,0.4));
+    padding: 20px 24px;
+    text-align: left;
+  }
+  .addons-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(243,221,196,0.1);
+    font-size: 14px;
+  }
+  .addons-row:last-child{ border-bottom: none; }
+  .addons-row .label{ color: rgba(243,221,196,0.9); letter-spacing: 0.02em; }
+  .addons-row .amt{ color: var(--tan); font-weight: 700; white-space: nowrap; }
+
+  .booking-note{
+    font-size: 14px;
+    line-height: 1.8;
+    color: rgba(243,221,196,0.9);
+  }
+  .booking-link{
+    display: inline-block;
+    margin-top: 14px;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    color: var(--tan);
+    text-decoration: underline;
+  }
+
+  .footer{
+    position: relative;
+    z-index: 1;
+    margin-top: 50px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: rgba(243,221,196,0.55);
+  }
+  .footer a{
+    color: var(--tan);
+    text-decoration: none;
+  }
+
+  .back-link{
+    position: relative;
+    z-index: 1;
+    margin-top: 6px;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tan);
+    text-decoration: none;
+    border: 1px solid rgba(201,168,118,0.35);
+    border-radius: 999px;
+    padding: 10px 20px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="grid-bg"></div>
+  <div class="vignette"></div>
+
+  <div class="page-head">
+    <h1>Pricing</h1>
+    <div class="sub">Radiomeltdown Mobile Bartending · July 4th Holiday Pricing</div>
+  </div>
+
+  <a class="back-link" href="https://radiomeltdown.store">&larr; Back to Home</a>
+
+  <!-- TRADITIONAL BAR SERVICE -->
+  <div class="section">
+    <div class="section-title">Traditional Bar Service — Drinks Only, No Salsa Bar</div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="name">Tip Only Package</span>
+        <span class="price">$150 Retainer</span>
+      </div>
+      <div class="note">Retainer Required to Book</div>
+
+      <h4>Includes</h4>
+      <ul>
+        <li>Professional Bartender</li>
+        <li>Setup &amp; Breakdown</li>
+        <li>Drink Service</li>
+        <li>Ice Management</li>
+        <li>Disposable Bar Supplies (straws, napkins)</li>
+      </ul>
+
+      <h4>How It Works</h4>
+      <p>
+        Client pays a $150 non-refundable retainer to reserve the date. Bartender works for tips during the event. If tips exceed $150, bartender keeps all tips. If total tips are less than $150, the retainer serves as the guaranteed minimum.
+      </p>
+
+      <h4>Recommended For</h4>
+      <ul>
+        <li>House Parties</li>
+        <li>Family Cookouts</li>
+        <li>Community Events</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="name">Paid Package</span>
+        <span class="price">$75/hr + Tips</span>
+      </div>
+      <div class="note">Minimum Booking: 4 Hours</div>
+
+      <h4>Includes</h4>
+      <ul>
+        <li>Professional Bartender</li>
+        <li>Setup &amp; Breakdown</li>
+        <li>Drink Service</li>
+        <li>Ice Management</li>
+        <li>Disposable Bar Supplies</li>
+      </ul>
+
+      <h4>Rates</h4>
+      <div class="rates">
+        <span>4 Hours = $300</span>
+        <span>5 Hours = $375</span>
+        <span>6 Hours = $450</span>
+      </div>
+
+      <p style="margin-top:14px;">Tips are appreciated and belong to the bartender.</p>
+
+      <h4>Recommended For</h4>
+      <ul>
+        <li>Corporate Events</li>
+        <li>Weddings</li>
+        <li>Large Gatherings</li>
+        <li>Private Celebrations</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ADD-ONS -->
+  <div class="section">
+    <div class="section-title">Add-Ons</div>
+    <div class="addons">
+      <div class="addons-row"><span class="label">Portable Bar Setup</span><span class="amt">$100</span></div>
+      <div class="addons-row"><span class="label">Signature Drink Menu</span><span class="amt">$50</span></div>
+      <div class="addons-row"><span class="label">Additional Bartender</span><span class="amt">$50/hour</span></div>
+      <div class="addons-row"><span class="label">Mocktail Station</span><span class="amt">$75</span></div>
+      <div class="addons-row"><span class="label">Premium Holiday Booking Fee</span><span class="amt">$50</span></div>
+    </div>
+  </div>
+
+  <!-- BOOKING -->
+  <div class="section">
+    <div class="section-title">Booking</div>
+    <div class="card">
+      <p class="booking-note">50% Deposit Required · Remaining Balance Due Event Day</p>
+      <a class="booking-link" href="https://radiomeltdown.store/Traditional">Book Online: radiomeltdown.store/Traditional</a>
+    </div>
+  </div>
+
+  <!-- A LA CARTE: DJ SERVICES -->
+  <div class="section">
+    <div class="section-title">A La Carte — DJ Services</div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="name">Basic Playlist DJ</span>
+        <span class="price">$150</span>
+      </div>
+      <div class="note">Up to 4 Hours</div>
+      <h4>Includes</h4>
+      <ul>
+        <li>Curated Playlist</li>
+        <li>Basic Announcements</li>
+        <li>Wireless Speaker Setup</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="name">Live DJ Service</span>
+        <span class="price">$75/hr</span>
+      </div>
+      <h4>Includes</h4>
+      <ul>
+        <li>Live Mixing</li>
+        <li>Crowd Interaction</li>
+        <li>Requests</li>
+        <li>Professional Sound System</li>
+      </ul>
+      <h4>Rates</h4>
+      <div class="rates">
+        <span>4 Hours = $300</span>
+        <span>5 Hours = $375</span>
+        <span>6 Hours = $450</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM RADIO STATION -->
+  <div class="section">
+    <div class="section-title">Radiomeltdown Custom Radio Station</div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="name">Event Radio Channel</span>
+        <span class="price">$100</span>
+      </div>
+      <div class="note">Flat Rate</div>
+      <h4>Includes</h4>
+      <ul>
+        <li>Custom Event Playlist</li>
+        <li>Dedicated Streaming Link</li>
+        <li>Accessible Before, During &amp; After Event</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="name">Premium Custom Radio Experience</span>
+        <span class="price">$250</span>
+      </div>
+      <div class="note">Flat Rate</div>
+      <h4>Includes</h4>
+      <ul>
+        <li>Branded Event Station</li>
+        <li>Custom Station Name</li>
+        <li>Personalized Audio Drops</li>
+        <li>Client Playlist Integration</li>
+        <li>30 Days Online Access</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- BUNDLES -->
+  <div class="section">
+    <div class="section-title">Bundles</div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="name">DJ + Mobile Bar Bundle</span>
+        <span class="price">$500</span>
+      </div>
+      <div class="note">4-Hour Event</div>
+      <h4>Includes</h4>
+      <ul>
+        <li>Bartending Service</li>
+        <li>DJ Service</li>
+        <li>Basic Sound Setup</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="name">Ultimate Party Package</span>
+        <span class="price">$750</span>
+      </div>
+      <div class="note">5 Hours Service</div>
+      <h4>Includes</h4>
+      <ul>
+        <li>Mobile Bartender</li>
+        <li>DJ Service</li>
+        <li>Custom Radiomeltdown Event Station</li>
+        <li>Event Announcements</li>
+        <li>Playlist Curation</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">EVENTS | Mack Magic Mobile Bar · <a href="tel:4707742370">470-774-2370</a></div>
+
+</body>
+</html>
