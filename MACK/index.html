@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#2e3636" />
+<title>Mack — Mack Magic Mobile Bar</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --tan:       #c9a876;
+    --peach:     #f3ddc4;
+    --teal:      #4f7a78;
+    --teal-grey: #5c7876;
+    --charcoal:  #232b2a;
+    --ink:       #1a201f;
+  }
+
+  html, body {
+    min-height: 100%;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(92,120,118,0.18) 0%, rgba(35,43,42,0) 55%),
+      var(--charcoal);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    color: var(--peach);
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6vh 6vw 60px;
+    text-align: center;
+  }
+
+  /* ── TEXTURE ── */
+  .grid-bg {
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(92,120,118,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(92,120,118,0.05) 1px, transparent 1px);
+    background-size: 42px 42px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .vignette {
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(26,32,31,0) 35%, rgba(26,32,31,0.55) 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── BACK NAV ── */
+  .back-nav {
+    position: relative;
+    z-index: 2;
+    align-self: flex-start;
+    margin-bottom: 28px;
+  }
+
+  .back-nav a {
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--tan);
+    text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .back-nav a:hover { opacity: 1; }
+
+  /* ── VIDEO CARD ── */
+  .video-frame {
+    position: relative;
+    z-index: 1;
+    width: min(420px, 90vw);
+    aspect-ratio: 16 / 9;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(201,168,118,0.4);
+    box-shadow: 0 18px 50px rgba(0,0,0,0.45), 0 0 0 1px rgba(243,221,196,0.05) inset;
+    background: var(--ink);
+  }
+
+  .video-frame iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  /* ── NAME PLATE ── */
+  .name-plate {
+    position: relative;
+    z-index: 1;
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .name-plate h1 {
+    font-size: clamp(2rem, 8vw, 3.2rem);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--peach);
+    line-height: 1;
+  }
+
+  .name-plate .title-line {
+    font-size: 11px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--tan);
+    opacity: 0.9;
+  }
+
+  .status-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--teal);
+    opacity: 0.9;
+  }
+
+  .status-dot::before {
+    content: '';
+    display: block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #5fc89a;
+    box-shadow: 0 0 6px #5fc89a;
+    animation: pulse 2.2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ── BIO CARD ── */
+  .bio-card {
+    position: relative;
+    z-index: 1;
+    margin-top: 32px;
+    width: min(440px, 90vw);
+    border-radius: 14px;
+    border: 1px solid rgba(243,221,196,0.2);
+    background: linear-gradient(180deg, rgba(92,120,118,0.14), rgba(35,43,42,0.4));
+    backdrop-filter: blur(4px);
+    padding: 24px 22px;
+    text-align: left;
+  }
+
+  .bio-card .eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--tan);
+    opacity: 0.8;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .bio-card p {
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    line-height: 1.8;
+    color: var(--peach);
+    opacity: 0.9;
+  }
+
+  .bio-card p + p {
+    margin-top: 12px;
+  }
+
+  .bio-card strong {
+    color: var(--tan);
+    font-weight: 700;
+  }
+
+  /* ── GENRE CHIPS ── */
+  .genre-row {
+    position: relative;
+    z-index: 1;
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    width: min(440px, 90vw);
+  }
+
+  .chip {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--peach);
+    border: 1px solid rgba(243,221,196,0.2);
+    border-radius: 99px;
+    padding: 5px 14px;
+    background: rgba(92,120,118,0.12);
+    opacity: 0.85;
+  }
+
+  /* ── MODE CONTROLS ── */
+  .controls-section {
+    position: relative;
+    z-index: 1;
+    margin-top: 36px;
+    width: min(440px, 90vw);
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--tan);
+    opacity: 0.75;
+    margin-bottom: 14px;
+    display: block;
+    text-align: left;
+  }
+
+  .mode-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .mode-card {
+    border-radius: 14px;
+    border: 1px solid rgba(243,221,196,0.18);
+    background: linear-gradient(180deg, rgba(92,120,118,0.14), rgba(35,43,42,0.4));
+    padding: 18px 16px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .mode-icon {
+    font-size: 1.4rem;
+    margin-bottom: 4px;
+  }
+
+  .mode-name {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--peach);
+  }
+
+  .mode-desc {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    line-height: 1.5;
+    color: var(--tan);
+    opacity: 0.85;
+  }
+
+  /* ── PACKAGES ── */
+  .packages-section {
+    position: relative;
+    z-index: 1;
+    margin-top: 36px;
+    width: min(440px, 90vw);
+  }
+
+  .pkg-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pkg-card {
+    border-radius: 14px;
+    border: 1px solid rgba(243,221,196,0.18);
+    background: linear-gradient(180deg, rgba(92,120,118,0.14), rgba(35,43,42,0.4));
+    padding: 20px 20px 18px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.2s;
+  }
+
+  .pkg-card.highlight {
+    border-color: rgba(201,168,118,0.45);
+    background: linear-gradient(180deg, rgba(92,120,118,0.22), rgba(35,43,42,0.55));
+  }
+
+  .pkg-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .pkg-name {
+    font-size: clamp(1rem, 3.5vw, 1.15rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--peach);
+  }
+
+  .pkg-badge {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--charcoal);
+    background: var(--tan);
+    border-radius: 99px;
+    padding: 3px 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .pkg-items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .pkg-items li {
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    color: var(--peach);
+    opacity: 0.85;
+    line-height: 1.5;
+    padding-left: 14px;
+    position: relative;
+  }
+
+  .pkg-items li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--teal);
+    font-size: 11px;
+  }
+
+  .pkg-note {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    font-style: italic;
+    color: var(--tan);
+    opacity: 0.75;
+    margin-top: 2px;
+  }
+
+  /* ── CTA ── */
+  .cta-block {
+    position: relative;
+    z-index: 1;
+    margin-top: 36px;
+    width: min(440px, 90vw);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-primary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 24px;
+    border-radius: 14px;
+    text-decoration: none;
+    border: 1px solid rgba(201,168,118,0.45);
+    background: linear-gradient(180deg, rgba(92,120,118,0.28), rgba(35,43,42,0.55));
+    transition: transform 0.18s ease, border-color 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    border-color: var(--teal);
+  }
+
+  .btn-primary .label {
+    font-size: clamp(18px, 4.4vw, 22px);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--peach);
+  }
+
+  .btn-primary .sub {
+    margin-top: 4px;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tan);
+    opacity: 0.85;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    position: relative;
+    z-index: 1;
+    width: min(440px, 90vw);
+    height: 1px;
+    background: rgba(243,221,196,0.1);
+    margin: 36px 0 0;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    position: relative;
+    z-index: 1;
+    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .footer p {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(243,221,196,0.45);
+    line-height: 1.7;
+  }
+
+  .footer a {
+    color: var(--tan);
+    text-decoration: none;
+  }
+
+  .footer .phone-cta {
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    color: var(--peach);
+    opacity: 0.85;
+  }
+
+  /* ── TV / LARGE SCREEN ── */
+  @media (min-width: 900px) {
+    body { padding: 5vh 8vw 80px; }
+
+    .page-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+      width: min(960px, 90vw);
+      text-align: left;
+    }
+
+    .left-col, .right-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+    }
+
+    .video-frame {
+      width: 100%;
+    }
+
+    .name-plate {
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .bio-card, .genre-row, .controls-section,
+    .packages-section, .cta-block, .divider, .footer {
+      width: 100%;
+    }
+
+    .genre-row { justify-content: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="grid-bg"></div>
+  <div class="vignette"></div>
+
+  <div class="back-nav">
+    <a href="/">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Back
+    </a>
+  </div>
+
+  <!-- On large screens, wrap in a 2-col grid -->
+  <div class="page-grid">
+
+    <!-- LEFT: Video + Name + Bio -->
+    <div class="left-col">
+
+      <div class="video-frame">
+        <iframe
+          src="https://player.cloudinary.com/embed/?cloud_name=dyqfcbgqo&public_id=Make_her_wink_background_move_202606201224_smam4i&source_types[]=mp4&autoplay=true&loop=true&muted=true&controls=false&fluid=true"
+          allow="autoplay"
+          allowfullscreen
+          title="Mack Magic intro">
+        </iframe>
+      </div>
+
+      <div class="name-plate">
+        <h1>Mack</h1>
+        <span class="title-line">Mobile Bartender · Music Host · Entertainment</span>
+        <span class="status-dot">Available for Bookings</span>
+      </div>
+
+      <div class="bio-card" style="margin-top:24px;">
+        <span class="eyebrow">Who you're booking</span>
+        <p>
+          <strong>Detroit born. Liberian raised. Lithonia living.</strong> I bring nonstop vibes and I play everything — R&B, Hip-Hop, Afrobeats, Gospel, House, Old School, whatever the room needs.
+        </p>
+        <p>
+          Is your DJ running late? <strong>No worries — I've got it covered.</strong> Does your DJ have to leave before the party ends? <strong>The music doesn't stop.</strong> DJ backup is built into every booking, no extra charge, no awkward silence.
+        </p>
+        <p>
+          Karaoke packages also available. Supplies are provided by the guest. For device packages, an extra tablet and extra monitor are included — <strong>and you keep the devices.</strong>
+        </p>
+      </div>
+
+      <div class="genre-row" style="margin-top:16px;">
+        <span class="chip">Hip-Hop</span>
+        <span class="chip">R&amp;B</span>
+        <span class="chip">Afrobeats</span>
+        <span class="chip">Old School</span>
+        <span class="chip">Gospel</span>
+        <span class="chip">House</span>
+        <span class="chip">Pop</span>
+        <span class="chip">All Genres</span>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Modes + Packages + CTA -->
+    <div class="right-col">
+
+      <div class="controls-section">
+        <span class="section-label">What's Included</span>
+        <div class="mode-grid">
+          <div class="mode-card">
+            <div class="mode-icon">🎧</div>
+            <div class="mode-name">Music Mode</div>
+            <div class="mode-desc">All genres. Live vibe control. DJ backup if your DJ is late or leaves early.</div>
+          </div>
+          <div class="mode-card">
+            <div class="mode-icon">🎤</div>
+            <div class="mode-name">Karaoke</div>
+            <div class="mode-desc">YouTube-powered. Works for kids, adults, and corporate events.</div>
+          </div>
+          <div class="mode-card">
+            <div class="mode-icon">📺</div>
+            <div class="mode-name">Screen Mode</div>
+            <div class="mode-desc">Mirror to any TV or tablet. Turn the whole room into a live jukebox.</div>
+          </div>
+          <div class="mode-card">
+            <div class="mode-icon">🍸</div>
+            <div class="mode-name">The Bar</div>
+            <div class="mode-desc">Craft cocktails, custom menus, full mobile setup. Supplies by guest.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="packages-section" style="margin-top:28px;">
+        <span class="section-label">Packages</span>
+        <div class="pkg-stack">
+
+          <div class="pkg-card">
+            <div class="pkg-header">
+              <span class="pkg-name">The Setup</span>
+            </div>
+            <ul class="pkg-items">
+              <li>Mobile bar + cocktail service</li>
+              <li>All-genre music management</li>
+              <li>DJ backup coverage</li>
+              <li>Supplies provided by guest</li>
+            </ul>
+          </div>
+
+          <div class="pkg-card highlight">
+            <div class="pkg-header">
+              <span class="pkg-name">The Full Send</span>
+              <span class="pkg-badge">Most Popular</span>
+            </div>
+            <ul class="pkg-items">
+              <li>Everything in The Setup</li>
+              <li>Karaoke activated (YouTube-powered)</li>
+              <li>Guest song selection — kids, adults, corporate</li>
+              <li>Supplies provided by guest</li>
+            </ul>
+          </div>
+
+          <div class="pkg-card">
+            <div class="pkg-header">
+              <span class="pkg-name">Device Package</span>
+            </div>
+            <ul class="pkg-items">
+              <li>Everything in The Full Send</li>
+              <li>Extra tablet included</li>
+              <li>Extra monitor for karaoke display</li>
+              <li>Full interactive jukebox setup</li>
+            </ul>
+            <p class="pkg-note">★ You keep the devices when you book this package.</p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="cta-block" style="margin-top:28px;">
+        <a class="btn-primary" href="https://radiomeltdown.store/Pricing">
+          <span class="label">See Pricing</span>
+          <span class="sub">Packages &amp; add-ons</span>
+        </a>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="footer" style="margin-top:24px; align-items:flex-start; text-align:left;">
+        <p class="phone-cta">📞 <a href="tel:4707742370">470-774-2370</a></p>
+        <p>Call or text for custom packages, large events, or questions.</p>
+        <p style="margin-top:8px;">Mack Magic Mobile Bar · Metro Atlanta<br />
+          <a href="https://radiomeltdown.store">radiomeltdown.store</a>
+        </p>
+      </div>
+
+    </div><!-- /right-col -->
+
+  </div><!-- /page-grid -->
+
+</body>
+</html>
