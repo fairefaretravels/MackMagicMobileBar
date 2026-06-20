@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#2e3636" />
+<title>Song Requests | Mack Magic Mobile Bar</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root{
+    --tan:        #c9a876;
+    --peach:      #f3ddc4;
+    --teal:       #4f7a78;
+    --teal-grey:  #5c7876;
+    --charcoal:   #232b2a;
+    --ink:        #1a201f;
+  }
+
+  html, body{
+    min-height: 100%;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(92,120,118,0.18) 0%, rgba(35,43,42,0) 55%),
+      var(--charcoal);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    color: var(--peach);
+  }
+
+  body{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6vh 6vw 10vh;
+    text-align: center;
+  }
+
+  .grid-bg{
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(92,120,118,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(92,120,118,0.05) 1px, transparent 1px);
+    background-size: 42px 42px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .vignette{
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(26,32,31,0) 35%, rgba(26,32,31,0.55) 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page-head{
+    position: relative;
+    z-index: 1;
+    margin-bottom: 28px;
+  }
+  .page-head h1{
+    font-size: clamp(24px, 6vw, 34px);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--peach);
+    font-weight: 700;
+  }
+  .page-head .sub{
+    margin-top: 8px;
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--tan);
+    opacity: 0.9;
+  }
+
+  .back-link{
+    position: relative;
+    z-index: 1;
+    margin-bottom: 30px;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tan);
+    text-decoration: none;
+    border: 1px solid rgba(201,168,118,0.35);
+    border-radius: 999px;
+    padding: 10px 20px;
+  }
+
+  /* tabs */
+  .tabs{
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 10px;
+    width: min(420px, 90vw);
+    margin-bottom: 30px;
+  }
+  .tab-btn{
+    flex: 1;
+    padding: 14px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(243,221,196,0.25);
+    background: linear-gradient(180deg, rgba(92,120,118,0.1), rgba(35,43,42,0.3));
+    color: var(--peach);
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .tab-btn.active{
+    border-color: var(--teal);
+    background: linear-gradient(180deg, rgba(92,120,118,0.32), rgba(35,43,42,0.55));
+    font-weight: 700;
+  }
+
+  .panel{
+    position: relative;
+    z-index: 1;
+    width: min(420px, 90vw);
+    border-radius: 16px;
+    border: 1px solid rgba(243,221,196,0.25);
+    background: linear-gradient(180deg, rgba(92,120,118,0.16), rgba(35,43,42,0.4));
+    padding: 28px 22px;
+    text-align: left;
+    display: none;
+  }
+  .panel.active{ display: block; }
+
+  .panel h2{
+    font-size: 15px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--tan);
+    margin-bottom: 6px;
+  }
+  .panel .desc{
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba(243,221,196,0.85);
+    margin-bottom: 22px;
+  }
+
+  label{
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--tan);
+    margin-bottom: 8px;
+    margin-top: 18px;
+  }
+  label:first-of-type{ margin-top: 0; }
+
+  input[type="text"],
+  input[type="email"],
+  textarea{
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(243,221,196,0.25);
+    background: rgba(26,32,31,0.55);
+    color: var(--peach);
+    font-family: 'Georgia', serif;
+    font-size: 14px;
+    outline: none;
+  }
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  textarea:focus{
+    border-color: var(--teal);
+  }
+  textarea{
+    resize: vertical;
+    min-height: 110px;
+  }
+
+  .file-wrap{
+    position: relative;
+    margin-top: 8px;
+  }
+  .file-wrap input[type="file"]{
+    width: 100%;
+    font-size: 12px;
+    color: var(--peach);
+    padding: 10px 0;
+  }
+  .file-note{
+    margin-top: 6px;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: rgba(243,221,196,0.55);
+  }
+
+  .submit-btn{
+    width: 100%;
+    margin-top: 26px;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(201,168,118,0.45);
+    background: linear-gradient(180deg, rgba(201,168,118,0.18), rgba(35,43,42,0.4));
+    color: var(--peach);
+    font-family: inherit;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.2s ease;
+  }
+  .submit-btn:hover{
+    transform: translateY(-2px);
+    border-color: var(--teal);
+  }
+  .submit-btn:active{ transform: translateY(0) scale(0.98); }
+
+  .footer{
+    position: relative;
+    z-index: 1;
+    margin-top: 44px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: rgba(243,221,196,0.55);
+  }
+  .footer a{
+    color: var(--tan);
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+
+  <div class="grid-bg"></div>
+  <div class="vignette"></div>
+
+  <div class="page-head">
+    <h1>Song Requests</h1>
+    <div class="sub">Mack Magic Mobile Bar</div>
+  </div>
+
+  <a class="back-link" href="https://radiomeltdown.store">&larr; Back to Home</a>
+
+  <div class="tabs">
+    <button class="tab-btn active" type="button" onclick="showPanel('live')" id="tab-live">Live Event</button>
+    <button class="tab-btn" type="button" onclick="showPanel('playlist')" id="tab-playlist">Plan My Playlist</button>
+  </div>
+
+  <!-- LIVE EVENT SONG REQUEST -->
+  <form class="panel active" id="panel-live" action="https://formspree.io/f/mbdenvwa" method="POST" enctype="multipart/form-data">
+    <h2>Request a Song — Live Event</h2>
+    <div class="desc">At the event right now? Drop in your request and we'll try to get it in the mix.</div>
+
+    <input type="hidden" name="Request Type" value="Live Event Song Request" />
+
+    <label for="live-artist">Artist</label>
+    <input type="text" id="live-artist" name="Artist" required />
+
+    <label for="live-title">Song Title</label>
+    <input type="text" id="live-title" name="Song Title" required />
+
+    <label for="live-name">Your Name (optional)</label>
+    <input type="text" id="live-name" name="Requested By" />
+
+    <label for="live-file">Have the MP3? Upload it here (optional)</label>
+    <div class="file-wrap">
+      <input type="file" id="live-file" name="MP3 Upload" accept="audio/mpeg,audio/mp3,.mp3" />
+    </div>
+    <div class="file-note">Only needed if it's a rare or hard-to-find track.</div>
+
+    <button class="submit-btn" type="submit">Send Request</button>
+  </form>
+
+  <!-- PLAYLIST PLANNING -->
+  <form class="panel" id="panel-playlist" action="https://formspree.io/f/mbdenvwa" method="POST" enctype="multipart/form-data">
+    <h2>Plan Your Event Playlist</h2>
+    <div class="desc">Booking us for an upcoming event? Send your must-play list and any songs to avoid, and we'll build your set around it.</div>
+
+    <input type="hidden" name="Request Type" value="Playlist Planning" />
+
+    <label for="pl-name">Your Name</label>
+    <input type="text" id="pl-name" name="Requested By" required />
+
+    <label for="pl-email">Email</label>
+    <input type="email" id="pl-email" name="Email" required />
+
+    <label for="pl-eventdate">Event Date</label>
+    <input type="text" id="pl-eventdate" name="Event Date" placeholder="e.g. July 4th, 2026" />
+
+    <label for="pl-songs">Song List (Artist - Title, one per line)</label>
+    <textarea id="pl-songs" name="Song List" required placeholder="Artist - Song Title&#10;Artist - Song Title&#10;Artist - Song Title"></textarea>
+
+    <label for="pl-file">Have any MP3s to send? Upload here (optional)</label>
+    <div class="file-wrap">
+      <input type="file" id="pl-file" name="MP3 Upload" accept="audio/mpeg,audio/mp3,.mp3" multiple />
+    </div>
+    <div class="file-note">You can select multiple files.</div>
+
+    <button class="submit-btn" type="submit">Send Playlist</button>
+  </form>
+
+  <div class="footer">EVENTS | Mack Magic Mobile Bar · <a href="tel:4707742370">470-774-2370</a></div>
+
+  <script>
+    function showPanel(which){
+      document.getElementById('panel-live').classList.toggle('active', which === 'live');
+      document.getElementById('panel-playlist').classList.toggle('active', which === 'playlist');
+      document.getElementById('tab-live').classList.toggle('active', which === 'live');
+      document.getElementById('tab-playlist').classList.toggle('active', which === 'playlist');
+    }
+  </script>
+
+</body>
+</html>
