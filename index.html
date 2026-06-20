@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#2e3636" />
+<title>Mack Magic Mobile Bar</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root{
+    --tan:        #c9a876;
+    --peach:      #f3ddc4;
+    --teal:       #4f7a78;
+    --teal-grey:  #5c7876;
+    --charcoal:   #232b2a;
+    --ink:        #1a201f;
+  }
+
+  html, body{
+    min-height: 100%;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(92,120,118,0.18) 0%, rgba(35,43,42,0) 55%),
+      var(--charcoal);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    color: var(--peach);
+  }
+
+  body{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6vh 6vw;
+    text-align: center;
+  }
+
+  /* faint grid texture echoing the radio page, kept very quiet here */
+  .grid-bg{
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(92,120,118,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(92,120,118,0.05) 1px, transparent 1px);
+    background-size: 42px 42px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .vignette{
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(26,32,31,0) 35%, rgba(26,32,31,0.55) 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .logo-frame{
+    position: relative;
+    z-index: 1;
+    width: min(420px, 84vw);
+    aspect-ratio: 16 / 9;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(201,168,118,0.4);
+    box-shadow: 0 18px 50px rgba(0,0,0,0.45), 0 0 0 1px rgba(243,221,196,0.05) inset;
+    background: var(--ink);
+  }
+  .logo-frame video,
+  .logo-frame iframe{
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .tagline{
+    position: relative;
+    z-index: 1;
+    margin-top: 22px;
+    font-size: 12px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--tan);
+    opacity: 0.9;
+  }
+
+  .menu{
+    position: relative;
+    z-index: 1;
+    margin-top: 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: min(380px, 86vw);
+  }
+
+  .btn{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 24px;
+    border-radius: 14px;
+    text-decoration: none;
+    border: 1px solid rgba(243,221,196,0.25);
+    background: linear-gradient(180deg, rgba(92,120,118,0.16), rgba(35,43,42,0.4));
+    backdrop-filter: blur(4px);
+    transition: transform 0.18s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+  .btn:hover{
+    transform: translateY(-2px);
+    border-color: var(--teal);
+    background: linear-gradient(180deg, rgba(92,120,118,0.28), rgba(35,43,42,0.55));
+  }
+  .btn:active{ transform: translateY(0px) scale(0.985); }
+
+  .btn .label{
+    font-size: clamp(18px, 4.4vw, 22px);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--peach);
+  }
+  .btn .sub{
+    margin-top: 4px;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tan);
+    opacity: 0.85;
+  }
+
+  /* ---- promo pic cards ---- */
+  .promo-row{
+    position: relative;
+    z-index: 1;
+    margin-top: 90px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    justify-content: center;
+    width: min(440px, 90vw);
+  }
+
+  .pic-card{
+    width: 160px;
+    text-decoration: none;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(243,221,196,0.25);
+    background: linear-gradient(180deg, rgba(92,120,118,0.16), rgba(35,43,42,0.4));
+    transition: transform 0.18s ease, border-color 0.2s ease;
+  }
+  .pic-card:hover{
+    transform: translateY(-2px);
+    border-color: var(--teal);
+  }
+  .pic-card img{
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+  .pic-card .pc-caption{
+    padding: 10px 8px 12px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--peach);
+    line-height: 1.4;
+  }
+  .pic-card .pc-caption .pc-sub{
+    display: block;
+    margin-top: 3px;
+    font-size: 10px;
+    color: var(--tan);
+    letter-spacing: 0.14em;
+    opacity: 0.85;
+  }
+
+  .footer{
+    position: relative;
+    z-index: 1;
+    margin-top: 40px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: rgba(243,221,196,0.55);
+  }
+  .footer a{
+    color: var(--tan);
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+
+  <div class="grid-bg"></div>
+  <div class="vignette"></div>
+
+  <div class="logo-frame">
+    <iframe src="https://player.cloudinary.com/embed/?cloud_name=dyqfcbgqo&public_id=MMslide_eqqhtb&source_types[]=mp4&autoplay=true&loop=true&muted=true&controls=false&fluid=true" allow="autoplay" allowfullscreen></iframe>
+  </div>
+
+  <div class="tagline">Serving Metro Atlanta</div>
+
+  <nav class="menu">
+    <a class="btn" href="https://mobile-bartender.vercel.app/Traditional">
+      <span class="label">Traditional</span>
+      <span class="sub">Classic Cocktail Menu</span>
+    </a>
+    <a class="btn" href="https://mobile-bartender.vercel.app/Cantina">
+      <span class="label">Cantina</span>
+      <span class="sub">Tequila &amp; agave menu</span>
+    </a>
+    <a class="btn" href="https://radiomeltdown.store/Pricing">
+      <span class="label">Pricing</span>
+      <span class="sub">Packages &amp; add-ons</span>
+    </a>
+    <a class="btn" href="https://radiomeltdown.store/DJ">
+      <span class="label">DJ &amp; Song Requests</span>
+      <span class="sub">Request a song or plan your playlist</span>
+    </a>
+  </nav>
+
+  <div class="promo-row">
+    <a class="pic-card" href="https://sen-finds.myshopify.com/" target="_blank" rel="noopener">
+      <img src="mmlogo-card.png" alt="Shop XOCO" />
+      <span class="pc-caption">Found It On TikTok<span class="pc-sub">Shop</span></span>
+    </a>
+
+    <a class="pic-card" href="https://music.youtube.com/watch?v=R8B3-SPlP18" target="_blank" rel="noopener">
+      <img src="https://res.cloudinary.com/dyqfcbgqo/image/upload/Cruizin-promo_deajt6.png" alt="Cruzin' feat. Risk" />
+      <span class="pc-caption">NEW MUSIC<span class="pc-sub">Cruzin' feat. Risk</span></span>
+    </a>
+
+    <a class="pic-card" href="https://radiomeltdown.com" target="_blank" rel="noopener">
+      <img src="https://res.cloudinary.com/dyqfcbgqo/image/upload/MMlogo_xzbaim.jpg" alt="Mack Magic" />
+      <span class="pc-caption">Mack Magic<span class="pc-sub">radiomeltdown.com</span></span>
+    </a>
+  </div>
+
+  <div class="footer">EVENTS | Mack Magic Mobile Bar · <a href="tel:4707742370">470-774-2370</a></div>
+
+</body>
+</html>
